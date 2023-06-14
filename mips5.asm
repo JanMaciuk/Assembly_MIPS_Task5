@@ -1,23 +1,23 @@
 .data
-	coefs: .float 2.3 3.45 7.67 5.32
-	degree: .word 3
-	questionString: .asciiz "\nPodaj wartosc X do obliczenia wielomianu: (zero aby wyjsc)\n"
+	coefs:   .float 2.3 3.45 7.67 5.32
+	degree:  .word  3
+	qString: .asciiz "\nPodaj wartosc X do obliczenia wielomianu: (zero aby wyjsc)\n"
 
 .text
 
 mainLoop:
-	li  $v0, 4 		# Kod print String
-	la  $a0, questionString	# Adres Stringa do wyswietlenia
+	li    $v0, 4 		# Kod print String
+	la    $a0, qString	# Adres Stringa do wyswietlenia
 	syscall
-	li  $v0, 6 		# Wczytaj float z konsoli (wartosc w $f0)
+	li    $v0, 6 		# Wczytaj float z konsoli (wartosc w $f0)
 	syscall
-	la $s0, coefs		# W $s0 podaje adres poczatku tablicy wspolczynnikow
-	lw $s1, degree 		# W $s1 podaje stopien wielomianu
-	mfc1 $t0, $f0		# Pobieram podana wartosc do sprawdzenia czy jest 0
+	la    $s0, coefs	# W $s0 podaje adres poczatku tablicy wspolczynnikow
+	lw    $s1, degree 	# W $s1 podaje stopien wielomianu
+	mfc1  $t0, $f0		# Pobieram podana wartosc do sprawdzenia czy jest 0
 	mov.s $f12, $f0 	# Zapisuje wartosc X jako $f12 (zgodnie z konwencja)
-	beqz $t0, exit 		# Jezeli podano 0 wyjdz z programu
-	jal eval_poly		# Wykonaj podprogram (2 warunki aby uzyc jump and link, zgodnie z konwencja), wedlug polecenia interakcja z konsola tylko w main
-	li $v0, 2		# Wyswietlenie wartosci typu float, dla double jest 3
+	beqz  $t0, exit 	# Jezeli podano 0 wyjdz z programu
+	jal   eval_poly		# Wykonaj podprogram (2 warunki aby uzyc jump and link, zgodnie z konwencja), wedlug polecenia interakcja z konsola tylko w main
+	li    $v0, 2		# Wyswietlenie wartosci typu float, dla double jest 3
 	#movf.d $f12, $f0	# Opcja gdybyœmy chcieli wyœwietlaæ typ double
 	cvt.s.d $f12, $f0 	# Zapisz wynik podprogramu do $f12 jako float (zgodnie z poleceniem)
 	syscall 		# Wyswietl wynik
@@ -28,10 +28,10 @@ mainLoop:
 # stopien = lw degree ($s1)
 # suma = lw (coefsAdress)
 # loop:
+#	coefsAdress = coefsAdress + 4
 #	wspolczynnik = lw (coefsAdress)
 #	suma = suma *x
 #	suma = suma + wspolczynnik
-#	coefsAdress = coefsAdress + 4
 #	stopien = stopien - 1
 #	if (stopien>0) goto loop
 # goto mainLoop
@@ -56,7 +56,6 @@ eval_poly:
 		add.d   $f0, $f0, $f10 	# Suma = Suma + wspolczynnik
 		subi    $s1, $s1, 1 	# Stopien = stopien - 1 (do nastepnego sprawdzenia)
 		bgtz    $s1, loop 	# Jezeli stopien > 0 to nie obliczylismy jeszcze calej sumy
-	
 	
 	#koniec podprogramu
 	koniec: jr $ra		# Powrot do petli
